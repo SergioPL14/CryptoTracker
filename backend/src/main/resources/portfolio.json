@@ -1,0 +1,12 @@
+{
+  "holdings": [
+    {
+      "symbol": "BTC",
+      "amount": 10.0
+    },
+    {
+      "symbol": "ETH",
+      "amount": 250.0
+    }
+  ]
+} 
