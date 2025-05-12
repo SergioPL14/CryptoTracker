@@ -15,27 +15,25 @@ import {
     Alert
 } from '@mui/material';
 import { Edit as EditIcon, Check as CheckIcon, Close as CloseIcon } from '@mui/icons-material';
+import { PortfolioSummary } from '../types/portfolio';
 
 export const HoldingsTable: React.FC = () => {
     const [editingSymbol, setEditingSymbol] = useState<string | null>(null);
     const [editAmount, setEditAmount] = useState<string>('');
     const queryClient = useQueryClient();
 
-    const { data: summary, isLoading, error } = useQuery(
-        ['portfolioSummary'],
-        api.getPortfolioSummary
-    );
+    const { data: summary, isLoading, error } = useQuery<PortfolioSummary, Error>({
+        queryKey: ['portfolioSummary'],
+        queryFn: api.getPortfolioSummary
+    });
 
-    const updateMutation = useMutation(
-        ({ symbol, amount }: { symbol: string; amount: number }) =>
-            api.updateHolding(symbol, amount),
-        {
-            onSuccess: () => {
-                queryClient.invalidateQueries(['portfolioSummary']);
-                setEditingSymbol(null);
-            }
+    const updateMutation = useMutation<void, Error, { symbol: string; amount: number }>({
+        mutationFn: ({ symbol, amount }) => api.updateHolding(symbol, amount),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['portfolioSummary'] });
+            setEditingSymbol(null);
         }
-    );
+    });
 
     if (isLoading) return <CircularProgress />;
     if (error) return <Alert severity="error">Error loading holdings</Alert>;

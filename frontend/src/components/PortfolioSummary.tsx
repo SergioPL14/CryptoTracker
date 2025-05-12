@@ -7,23 +7,30 @@ import {
     Typography,
     Grid,
     CircularProgress,
-    Alert
+    Alert,
+    Box
 } from '@mui/material';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { PortfolioSummary as PortfolioSummaryType } from '../types/portfolio';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
+interface ChartData {
+    name: string;
+    value: number;
+}
+
 export const PortfolioSummary: React.FC = () => {
-    const { data: summary, isLoading, error } = useQuery(
-        ['portfolioSummary'],
-        api.getPortfolioSummary
-    );
+    const { data: summary, isLoading, error } = useQuery<PortfolioSummaryType, Error>({
+        queryKey: ['portfolioSummary'],
+        queryFn: api.getPortfolioSummary
+    });
 
     if (isLoading) return <CircularProgress />;
     if (error) return <Alert severity="error">Error loading portfolio</Alert>;
     if (!summary) return null;
 
-    const pieData = summary.holdings.map(holding => ({
+    const pieData: ChartData[] = summary.holdings.map(holding => ({
         name: holding.symbol,
         value: holding.valueUsd
     }));
@@ -31,8 +38,8 @@ export const PortfolioSummary: React.FC = () => {
     return (
         <Card>
             <CardContent>
-                <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                    <Box sx={{ flex: '1 1 300px', minWidth: 0 }}>
                         <Typography variant="h5" gutterBottom>
                             Portfolio Summary
                         </Typography>
@@ -42,9 +49,9 @@ export const PortfolioSummary: React.FC = () => {
                         <Typography variant="subtitle1" color="textSecondary">
                             €{summary.totalValueEur.toLocaleString()}
                         </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <ResponsiveContainer width="100%" height={200}>
+                    </Box>
+                    <Box sx={{ flex: '1 1 300px', minWidth: 0, height: 200 }}>
+                        <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
                                     data={pieData}
@@ -65,8 +72,8 @@ export const PortfolioSummary: React.FC = () => {
                                 <Tooltip />
                             </PieChart>
                         </ResponsiveContainer>
-                    </Grid>
-                </Grid>
+                    </Box>
+                </Box>
             </CardContent>
         </Card>
     );
