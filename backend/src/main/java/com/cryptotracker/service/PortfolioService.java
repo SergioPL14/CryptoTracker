@@ -99,15 +99,20 @@ public class PortfolioService {
 
         List<HoldingDetails> holdingDetails = portfolio.getHoldings().stream()
                 .map(holding -> {
-                    Map<String, Object> priceData = prices.get(
-                            symbolToId.getOrDefault(holding.getSymbol().toLowerCase(), holding.getSymbol()));
+                    String symbol = holding.getSymbol();
+                    String coinGeckoId = symbolToId.getOrDefault(symbol.toUpperCase(), symbol.toLowerCase());
+                    Map<String, Object> priceData = prices.get(coinGeckoId);
+                    
+                    if (priceData == null) {
+                        throw new RuntimeException("Could not fetch price data for symbol: " + symbol);
+                    }
                     
                     double priceUsd = ((Number) priceData.get("usd")).doubleValue();
                     double priceEur = ((Number) priceData.get("eur")).doubleValue();
                     double priceChange = ((Number) priceData.get("usd_24h_change")).doubleValue();
 
                     return HoldingDetails.builder()
-                            .symbol(holding.getSymbol())
+                            .symbol(symbol)
                             .amount(holding.getAmount())
                             .priceUsd(priceUsd)
                             .priceEur(priceEur)
