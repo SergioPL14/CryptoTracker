@@ -2,6 +2,8 @@
 
 A simple cryptocurrency portfolio tracker that displays your holdings in real-time. Perfect for users who manage their crypto in cold wallets and want to track their portfolio value.
 
+This application has been developped and it's maintained following the principles of Vibe Coding: https://en.wikipedia.org/wiki/Vibe_coding
+
 ## Features
 
 - Real-time cryptocurrency price tracking
