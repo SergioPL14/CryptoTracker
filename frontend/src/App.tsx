@@ -39,7 +39,7 @@ function App() {
         <CssBaseline />
         <Container maxWidth="lg">
           <Box sx={{ my: 4 }}>
-            <PortfolioSummary />
+            <PortfolioSummary  portfolioId="main"/>
             <Box sx={{ mt: 4 }}>
               <HoldingsTable portfolioId="main" />
             </Box>

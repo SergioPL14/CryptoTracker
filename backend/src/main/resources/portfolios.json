@@ -7,11 +7,11 @@
       "holdings": [
         {
           "symbol": "BTC",
-          "amount": 10
+          "amount": 8
         },
         {
           "symbol": "ETH",
-          "amount": 250
+          "amount": 150
         }
       ]
     },
