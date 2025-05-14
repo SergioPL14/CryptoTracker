@@ -18,5 +18,8 @@ export interface PortfolioSummary {
 }
 
 export interface Portfolio {
+    id: string;
+    name: string;
+    description: string;
     holdings: Holding[];
 } 

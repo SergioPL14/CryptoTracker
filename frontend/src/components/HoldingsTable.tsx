@@ -15,22 +15,27 @@ import {
     Alert
 } from '@mui/material';
 import { Edit as EditIcon, Check as CheckIcon, Close as CloseIcon } from '@mui/icons-material';
-import { PortfolioSummary } from '../types/portfolio';
+import { PortfolioSummary, HoldingDetails } from '../types/portfolio';
 
-export const HoldingsTable: React.FC = () => {
+interface HoldingsTableProps {
+    portfolioId: string;
+    // ... other props
+}
+
+export const HoldingsTable: React.FC<HoldingsTableProps> = ({ portfolioId, /* other props */ }) => {
     const [editingSymbol, setEditingSymbol] = useState<string | null>(null);
     const [editAmount, setEditAmount] = useState<string>('');
     const queryClient = useQueryClient();
 
     const { data: summary, isLoading, error } = useQuery<PortfolioSummary, Error>({
-        queryKey: ['portfolioSummary'],
-        queryFn: api.getPortfolioSummary
+        queryKey: ['portfolioSummary', portfolioId],
+        queryFn: () => api.getPortfolioSummary(portfolioId)
     });
 
-    const updateMutation = useMutation<void, Error, { symbol: string; amount: number }>({
-        mutationFn: ({ symbol, amount }) => api.updateHolding(symbol, amount),
+    const updateMutation = useMutation<HoldingDetails, Error, { symbol: string; amount: number }>({
+        mutationFn: ({ symbol, amount }) => api.updateHolding(portfolioId, symbol, amount),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['portfolioSummary'] });
+            queryClient.invalidateQueries({ queryKey: ['portfolioSummary', portfolioId] });
             setEditingSymbol(null);
         }
     });

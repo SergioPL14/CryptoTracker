@@ -11,7 +11,7 @@ import {
     Box
 } from '@mui/material';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { PortfolioSummary as PortfolioSummaryType } from '../types/portfolio';
+import { PortfolioSummary as PortfolioSummaryType, HoldingDetails } from '../types/portfolio';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
@@ -20,17 +20,17 @@ interface ChartData {
     value: number;
 }
 
-export const PortfolioSummary: React.FC = () => {
-    const { data: summary, isLoading, error } = useQuery<PortfolioSummaryType, Error>({
-        queryKey: ['portfolioSummary'],
-        queryFn: api.getPortfolioSummary
+export const PortfolioSummary: React.FC<{ portfolioId: string }> = ({ portfolioId }) => {
+    const { data: summary, isLoading, error } = useQuery<PortfolioSummaryType>({
+        queryKey: ['portfolioSummary', portfolioId],
+        queryFn: () => api.getPortfolioSummary(portfolioId)
     });
 
     if (isLoading) return <CircularProgress />;
     if (error) return <Alert severity="error">Error loading portfolio</Alert>;
     if (!summary) return null;
 
-    const pieData: ChartData[] = summary.holdings.map(holding => ({
+    const pieData: ChartData[] = summary.holdings.map((holding: HoldingDetails) => ({
         name: holding.symbol,
         value: holding.valueUsd
     }));
@@ -44,10 +44,10 @@ export const PortfolioSummary: React.FC = () => {
                             Portfolio Summary
                         </Typography>
                         <Typography variant="h4" color="primary">
-                            ${summary.totalValueUsd.toLocaleString()}
+                            ${summary?.totalValueUsd.toLocaleString()}
                         </Typography>
                         <Typography variant="subtitle1" color="textSecondary">
-                            €{summary.totalValueEur.toLocaleString()}
+                            €{summary?.totalValueEur.toLocaleString()}
                         </Typography>
                     </Box>
                     <Box sx={{ flex: '1 1 300px', minWidth: 0, height: 200 }}>

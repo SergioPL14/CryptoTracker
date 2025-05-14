@@ -41,7 +41,7 @@ function App() {
           <Box sx={{ my: 4 }}>
             <PortfolioSummary />
             <Box sx={{ mt: 4 }}>
-              <HoldingsTable />
+              <HoldingsTable portfolioId="main" />
             </Box>
           </Box>
         </Container>

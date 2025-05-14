@@ -1,0 +1,34 @@
+{
+  "portfolios": [
+    {
+      "id": "main",
+      "name": "Main Portfolio",
+      "description": "My primary investment portfolio",
+      "holdings": [
+        {
+          "symbol": "BTC",
+          "amount": 10
+        },
+        {
+          "symbol": "ETH",
+          "amount": 250
+        }
+      ]
+    },
+    {
+      "id": "trading",
+      "name": "Trading Portfolio",
+      "description": "Short-term trading positions",
+      "holdings": [
+        {
+          "symbol": "BTC",
+          "amount": 1
+        },
+        {
+          "symbol": "ETH",
+          "amount": 25
+        }
+      ]
+    }
+  ]
+} 

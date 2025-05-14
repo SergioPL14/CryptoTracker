@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
 
 @RestController
-@RequestMapping("/api/portfolio")
+@RequestMapping("/api/portfolios")
 @CrossOrigin(origins = "http://localhost:3000") // For development
 public class PortfolioController {
     private final PortfolioService portfolioService;
@@ -26,34 +27,61 @@ public class PortfolioController {
     }
 
     @GetMapping
-    public ResponseEntity<Portfolio> getPortfolio() throws IOException {
-        return ResponseEntity.ok(portfolioService.getPortfolio());
+    public ResponseEntity<List<Portfolio>> getAllPortfolios() throws IOException {
+        return ResponseEntity.ok(portfolioService.getAllPortfolios());
     }
 
-    @PutMapping("/{symbol}")
-    public ResponseEntity<Void> updateHolding(
+    @GetMapping("/{id}")
+    public ResponseEntity<Portfolio> getPortfolio(@PathVariable String id) throws IOException {
+        return ResponseEntity.ok(portfolioService.getPortfolioById(id));
+    }
+
+    @GetMapping("/{id}/summary")
+    public ResponseEntity<PortfolioSummary> getPortfolioSummary(@PathVariable String id) throws IOException {
+        return ResponseEntity.ok(portfolioService.getPortfolioSummary(id));
+    }
+
+    @PutMapping("/{id}/holdings/{symbol}")
+    public ResponseEntity<HoldingDetails> updateHolding(
+            @PathVariable String id,
             @PathVariable String symbol,
             @RequestParam double amount) throws IOException {
-        portfolioService.updateHolding(symbol, amount);
-        return ResponseEntity.ok().build();
+        portfolioService.updateHolding(id, symbol, amount);
+        Portfolio portfolio = portfolioService.getPortfolioById(id);
+        return ResponseEntity.ok(portfolioService.getHoldingDetails(id, symbol));
+    }
+
+    @PostMapping
+    public ResponseEntity<Portfolio> createPortfolio(@RequestBody Portfolio portfolio) throws IOException {
+        portfolioService.createPortfolio(portfolio);
+        return ResponseEntity.status(HttpStatus.CREATED).body(portfolio);
     }
 
     @GetMapping("/prices")
     public ResponseEntity<List<CryptoPrice>> getPrices() throws IOException {
-        Portfolio portfolio = portfolioService.getPortfolio();
-        List<String> symbols = portfolio.getHoldings().stream()
+        List<Portfolio> portfolios = portfolioService.getAllPortfolios();
+        List<String> symbols = portfolios.stream()
+                .flatMap(p -> p.getHoldings().stream())
                 .map(Holding::getSymbol)
+                .distinct()
                 .collect(Collectors.toList());
         return ResponseEntity.ok(cryptoPriceService.getPrices(symbols));
     }
 
-    @GetMapping("/holdings/{symbol}")
-    public ResponseEntity<HoldingDetails> getHoldingDetails(@PathVariable String symbol) throws IOException {
-        return ResponseEntity.ok(portfolioService.getHoldingDetails(symbol));
+    @GetMapping("/{portfolioId}/holdings/{symbol}")
+    public ResponseEntity<HoldingDetails> getHoldingDetails(
+            @PathVariable String portfolioId,
+            @PathVariable String symbol) throws IOException {
+        return ResponseEntity.ok(portfolioService.getHoldingDetails(portfolioId, symbol));
     }
 
-    @GetMapping("/summary")
-    public ResponseEntity<PortfolioSummary> getPortfolioSummary() throws IOException {
-        return ResponseEntity.ok(portfolioService.getPortfolioSummary());
+    @GetMapping("/symbols/supported")
+    public ResponseEntity<List<String>> getSupportedSymbols() {
+        return ResponseEntity.ok(portfolioService.getSupportedSymbols());
+    }
+
+    @GetMapping("/symbols/validate/{symbol}")
+    public ResponseEntity<Boolean> validateSymbol(@PathVariable String symbol) {
+        return ResponseEntity.ok(portfolioService.isValidSymbol(symbol));
     }
 } 

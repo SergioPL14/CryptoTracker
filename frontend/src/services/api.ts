@@ -9,8 +9,8 @@ export const api = {
         return response.data;
     },
 
-    getPortfolioSummary: async (): Promise<PortfolioSummary> => {
-        const response = await axios.get(`${API_BASE_URL}/portfolio/summary`);
+    getPortfolioSummary: async (portfolioId: string): Promise<PortfolioSummary> => {
+        const response = await axios.get(`${API_BASE_URL}/portfolios/${portfolioId}/summary`);
         return response.data;
     },
 
@@ -19,7 +19,20 @@ export const api = {
         return response.data;
     },
 
-    updateHolding: async (symbol: string, amount: number): Promise<void> => {
-        await axios.put(`${API_BASE_URL}/portfolio/${symbol}?amount=${amount}`);
+    updateHolding: async (portfolioId: string, symbol: string, amount: number): Promise<HoldingDetails> => {
+        const response = await axios.put(
+            `${API_BASE_URL}/portfolios/${portfolioId}/holdings/${symbol}?amount=${amount}`
+        );
+        return response.data;
+    },
+
+    getSupportedSymbols: async (): Promise<string[]> => {
+        const response = await axios.get(`${API_BASE_URL}/portfolios/symbols/supported`);
+        return response.data;
+    },
+
+    validateSymbol: async (symbol: string): Promise<boolean> => {
+        const response = await axios.get(`${API_BASE_URL}/portfolios/symbols/validate/${symbol}`);
+        return response.data;
     }
 }; 
